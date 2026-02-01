@@ -13,7 +13,8 @@
 #ifndef CUBE3D_H
 # define CUBE3D_H
 
-#define SPEED 0.1
+#define SPEED 0.2
+#define ROT_SPEED 0.05
 
 # include <unistd.h>
 # include <stdio.h>
