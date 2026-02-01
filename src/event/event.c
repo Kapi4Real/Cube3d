@@ -18,7 +18,6 @@ void	key_hook(int key, void *param)
 	t_mlx	*mlx;
 
 	mlx = (t_mlx *)param;
-	printf("Key pressed: %d\n", key);
 	if (key == KEY_ESC)
 		mlx_loop_end(mlx->mlx);
 	mlx->keys[key] = 1;
