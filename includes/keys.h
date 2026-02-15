@@ -6,12 +6,12 @@
 /*   By: ntome <ntome@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 14:15:32 by ntome             #+#    #+#             */
-/*   Updated: 2026/01/31 14:29:06 by ntome            ###   ########.fr       */
+/*   Updated: 2026/02/07 11:08:27 by ntome            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_KEYS_H
-# define FT_KEYS_H
+#ifndef KEYS_H
+# define KEYS_H
 
 # define KEY_A 4
 # define KEY_B 5

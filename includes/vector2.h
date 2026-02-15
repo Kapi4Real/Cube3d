@@ -6,7 +6,7 @@
 /*   By: ntome <ntome@42angouleme.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 16:12:41 by ntome             #+#    #+#             */
-/*   Updated: 2026/01/23 13:22:03 by ntome            ###   ########.fr       */
+/*   Updated: 2026/02/07 11:11:41 by ntome            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 # include <stdio.h>
 
-typedef struct	s_vec2
+typedef struct s_vec2
 {
 	int	x;
 	int	y;
 }				t_vec2;
 
-typedef struct	s_dvec2
+typedef struct s_dvec2
 {
 	double	x;
 	double	y;

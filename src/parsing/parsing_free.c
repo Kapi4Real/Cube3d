@@ -6,7 +6,7 @@
 /*   By: ntome <nicolas@42angouleme.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 16:35:36 by ntome             #+#    #+#             */
-/*   Updated: 2026/01/22 12:54:19 by ntome            ###   ########.fr       */
+/*   Updated: 2026/02/07 15:40:44 by ntome            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	free_raw_datas(t_parsing_infos *parsing_i)
 	int	i;
 
 	i = 0;
-	while (parsing_i->raw_datas[i])
+	while (parsing_i->raw_datas && parsing_i->raw_datas[i])
 	{
 		free(parsing_i->raw_datas[i]);
 		i++;
@@ -49,7 +49,7 @@ void	free_map(t_parsing_infos *parsing_i)
 	int	i;
 
 	i = 0;
-	while (parsing_i->map.map[i])
+	while (parsing_i->map.map && parsing_i->map.map[i])
 	{
 		free(parsing_i->map.map[i]);
 		i++;

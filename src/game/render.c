@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   render.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ntome <ntome@42angouleme.fr>               +#+  +:+       +#+        */
+/*   By: ntome <ntome@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 14:50:41 by ntome             #+#    #+#             */
-/*   Updated: 2026/01/31 14:22:58 by ntome            ###   ########.fr       */
+/*   Updated: 2026/02/07 13:18:47 by ntome            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,94 +19,96 @@
 
 void	init_ray(t_mlx *mlx, t_ray *ray, int x)
 {
-	ray->cameraX = 2 * x / (double)(mlx->window_size.x) - 1;
-	ray->rayDir.x = mlx->player.rot.x + mlx->player.plane.x * ray->cameraX;
-	ray->rayDir.y = mlx->player.rot.y + mlx->player.plane.y * ray->cameraX;
-	ray->mapPos = dvec2_to_vec2(mlx->player.pos);
-	if (ray->rayDir.x == 0.0)
-		ray->deltaDist.x = 1e30;
+	ray->camera_x = 2 * x / (double)(mlx->window_size.x) - 1;
+	ray->ray_dir.x = mlx->player.rot.x + mlx->player.plane.x * ray->camera_x;
+	ray->ray_dir.y = mlx->player.rot.y + mlx->player.plane.y * ray->camera_x;
+	ray->map_pos = dvec2_to_vec2(mlx->player.pos);
+	if (ray->ray_dir.x == 0.0)
+		ray->delta_dist.x = 1e30;
 	else
-		ray->deltaDist.x = fabs(1 / ray->rayDir.x);
-	if (ray->rayDir.y == 0.0)
-		ray->deltaDist.y = 1e30;
+		ray->delta_dist.x = fabs(1 / ray->ray_dir.x);
+	if (ray->ray_dir.y == 0.0)
+		ray->delta_dist.y = 1e30;
 	else
-		ray->deltaDist.y = fabs(1 / ray->rayDir.y);
+		ray->delta_dist.y = fabs(1 / ray->ray_dir.y);
 	ray->hit = 0;
-	if (ray->rayDir.x < 0)
-	{
-		ray->step.x = -1;
-		ray->sideDist.x = (mlx->player.pos.x - ray->mapPos.x) * ray->deltaDist.x;
-	}
-	else
-	{
-		ray->step.x = 1;
-		ray->sideDist.x = (ray->mapPos.x + 1.0 - mlx->player.pos.x) * ray->deltaDist.x;
-	}
-	if (ray->rayDir.y < 0)
-	{
-		ray->step.y = -1;
-		ray->sideDist.y = (mlx->player.pos.y - ray->mapPos.y) * ray->deltaDist.y;
-	}
-	else
-	{
-		ray->step.y = 1;
-		ray->sideDist.y = (ray->mapPos.y + 1.0 - mlx->player.pos.y) * ray->deltaDist.y;
-	}
+	init_side_dist(mlx, ray);
 }
 
 void	dda(t_mlx *mlx, t_ray *ray)
 {
 	while (!ray->hit)
 	{
-		if (ray->sideDist.x < ray->sideDist.y)
+		if (ray->side_dist.x < ray->side_dist.y)
 		{
-			ray->sideDist.x += ray->deltaDist.x;
-			ray->mapPos.x += ray->step.x;
+			ray->side_dist.x += ray->delta_dist.x;
+			ray->map_pos.x += ray->step.x;
 			ray->side = 0;
 		}
 		else
 		{
-			ray->sideDist.y += ray->deltaDist.y;
-			ray->mapPos.y += ray->step.y;
+			ray->side_dist.y += ray->delta_dist.y;
+			ray->map_pos.y += ray->step.y;
 			ray->side = 1;
 		}
-		if (mlx->map.map[ray->mapPos.y][ray->mapPos.x] == '1')
+		if (mlx->map.map[ray->map_pos.y][ray->map_pos.x] == '1')
 			ray->hit = 1;
 	}
 }
 
 void	init_draw(t_mlx *mlx, t_drawing *draw, t_ray *ray)
 {
-	draw->lineHeight = (int)(mlx->window_size.y / ray->perpWallDist);
-	draw->drawStart = -draw->lineHeight / 2 + mlx->window_size.y / 2;
-	if (draw->drawStart < 0)
-		draw->drawStart = 0;
-	draw->drawEnd = draw->lineHeight / 2 + mlx->window_size.y / 2;
-	if (draw->drawEnd >= mlx->window_size.y)
-		draw->drawEnd = mlx->window_size.y - 1;
-} 
+	draw->line_height = (int)(mlx->window_size.y / ray->perp_wall_dist);
+	draw->draw_start = -draw->line_height / 2 + mlx->window_size.y / 2;
+	if (draw->draw_start < 0)
+		draw->draw_start = 0;
+	draw->draw_end = draw->line_height / 2 + mlx->window_size.y / 2;
+	if (draw->draw_end >= mlx->window_size.y)
+		draw->draw_end = mlx->window_size.y - 1;
+	if (ray->side == 1)
+	{
+		draw->wall_x = mlx->player.pos.x + ray->perp_wall_dist * ray->ray_dir.x;
+		if (ray->ray_dir.y > 0)
+			draw->texture = mlx->we_wall;
+		else
+			draw->texture = mlx->ea_wall;
+	}
+	else
+	{
+		draw->wall_x = mlx->player.pos.y + ray->perp_wall_dist * ray->ray_dir.y;
+		if (ray->ray_dir.x > 0)
+			draw->texture = mlx->so_wall;
+		else
+			draw->texture = mlx->no_wall;
+	}
+	draw->wall_x -= floor(draw->wall_x);
+	draw->step = 1.0 * draw->texture.texture_height / draw->line_height;
+}
 
-void	setup_line(t_mlx *mlx, t_drawing *draw, t_ray *ray)
+void	setup_line(t_mlx *mlx, t_drawing *draw, t_ray *ray, int x)
 {
-	int			i;
+	int		i;
 
 	i = 0;
-	while (i < draw->drawStart)
+	while (i < draw->draw_start)
 	{
-		mlx->drawing_line[i] = mlx->ceiling;
+		mlx->draw_line[x + mlx->window_size.x * i] = mlx->ceiling;
 		i++;
 	}
-	while (i < draw->drawEnd)
+	draw->tex.x = (int)(draw->wall_x * (double)draw->texture.texture_width);
+	if (check_ray_side(ray))
+		draw->tex.x = draw->texture.texture_width - draw->tex.x - 1;
+	draw->tex_pos = get_tex_pos(mlx, draw);
+	while (i <= draw->draw_end)
 	{
-		if (ray->side == 1)
-			mlx->drawing_line[i] = get_color("0,0,255,255");
-		else
-			mlx->drawing_line[i] = get_color("0,255,0,255");
+		draw->tex.y = (int)draw->tex_pos & (draw->texture.texture_height - 1);
+		draw->tex_pos += draw->step;
+		mlx->draw_line[x + mlx->window_size.x * i] = get_tex_color(mlx, draw);
 		i++;
 	}
 	while (i < mlx->window_size.y)
 	{
-		mlx->drawing_line[i] = mlx->floor;
+		mlx->draw_line[x + mlx->window_size.x * i] = mlx->floor;
 		i++;
 	}
 }
@@ -123,13 +125,13 @@ void	raycasting(t_mlx *mlx)
 		init_ray(mlx, &ray, i);
 		dda(mlx, &ray);
 		if (ray.side == 0)
-			ray.perpWallDist = (ray.sideDist.x - ray.deltaDist.x);
+			ray.perp_wall_dist = (ray.side_dist.x - ray.delta_dist.x);
 		else
-			ray.perpWallDist = (ray.sideDist.y - ray.deltaDist.y);
+			ray.perp_wall_dist = (ray.side_dist.y - ray.delta_dist.y);
 		init_draw(mlx, &draw, &ray);
-		setup_line(mlx, &draw, &ray);
-		mlx_pixel_put_region(mlx->mlx, mlx->win, i, 0, 1,
-			mlx->window_size.y, mlx->drawing_line);
+		setup_line(mlx, &draw, &ray, i);
 		i++;
 	}
+	mlx_pixel_put_region(mlx->mlx, mlx->win, 0, 0, mlx->window_size.x,
+		mlx->window_size.y, mlx->draw_line);
 }
